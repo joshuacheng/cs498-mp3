@@ -8,6 +8,6 @@ var TaskSchema = new mongoose.Schema({
     assignedUser: { type: String, default: "" },
     assignedUserName: { type: String, default: "unassigned"},
     dateCreated: { type: Date, default: Date.now } 
-})
+}, {versionKey: false}) // not recommended
 
 module.exports = mongoose.model('Task', TaskSchema);

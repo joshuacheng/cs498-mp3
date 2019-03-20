@@ -7,7 +7,7 @@ var UserSchema = new mongoose.Schema({
     email: { type: String, required: true },
     pendingTasks: [String],
     dateCreated: Date
-});
+}, {versionKey: false}); // versionKey: false not rec, but fine for this application
 
 // Export the Mongoose model
 module.exports = mongoose.model('User', UserSchema);
