@@ -3,7 +3,7 @@ var tasks = require('../models/task'),
     router = express.Router();
 
 router.get('/', function (req, res) {
-    tasks.find({}, (err, docs) => {
+    tasks.find({}, function (err, docs) {
         if (err) {
             res.status(500).send({
                 message: 'Server error',
@@ -13,6 +13,22 @@ router.get('/', function (req, res) {
             res.status(200).send({
                 message: 'OK',
                 data: docs
+            })
+        }
+    })
+})
+
+router.get('/:id', function (req, res) {
+    tasks.findOne({_id: req.params.id}, function (err, foundTask) {
+        if (err) {
+            res.status(404).send({
+                message: '404 Task Not Found',
+                data: {}
+            })
+        } else {
+            res.status(200).send({
+                message: 'OK',
+                data: foundTask
             })
         }
     })

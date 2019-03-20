@@ -21,6 +21,22 @@ router.get('/', function (req, res) {
     })
 })
 
+router.get('/:id', function (req, res) {
+    users.findOne({ _id: req.params.id }, function (err, foundTask) {
+        if (err) {
+            res.status(404).send({
+                message: '404 User Not Found',
+                data: {}
+            })
+        } else {
+            res.status(200).send({
+                message: 'OK',
+                data: foundTask
+            })
+        }
+    })
+})
+
 router.post('/', function (req, res) {
 
     // A user must have a name and email
