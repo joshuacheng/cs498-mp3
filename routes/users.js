@@ -29,11 +29,10 @@ router.post('/', function (req, res) {
             _id: new mongoose.Types.ObjectId(),
             name: req.body.name,
             email: req.body.email,
-            pendingTasks: [],
-            dateCreated: Date.now()
+            pendingTasks: req.body.pendingTasks || []
         }, (err, newUser) => {
             res.status(201).send({
-                message: 'POST worked',
+                message: 'POST /users successful',
                 user: newUser
             })
         })
