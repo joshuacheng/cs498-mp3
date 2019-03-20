@@ -37,6 +37,7 @@ router.get('/:id', function (req, res) {
     })
 })
 
+//TODO: no two same emails can exist
 router.post('/', function (req, res) {
 
     // A user must have a name and email
@@ -58,6 +59,22 @@ router.post('/', function (req, res) {
             data: {}
         })
     }
+})
+
+router.delete('/:id', function (req, res) {
+    users.findByIdAndDelete(req.params.id, function (err) {
+        if (err) {
+            console.log(err.errors);
+            res.status(404).send({
+                message: 'User to DELETE not found',
+                data: {}
+            })
+        } else {
+            res.status(200).send({
+                message: 'DELETE user successful'
+            })
+        }
+    })
 })
 
 module.exports = router;

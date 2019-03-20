@@ -77,5 +77,21 @@ router.post('/', function (req, res) {
     }
 })
 
+router.delete('/:id', function (req, res) {
+    users.findByIdAndDelete(req.params.id, function (err) {
+        if (err) {
+            console.log(err.errors);
+            res.status(404).send({
+                message: 'Task to DELETE not found',
+                data: {}
+            })
+        } else {
+            res.status(200).send({
+                message: 'DELETE task successful'
+            })
+        }
+    })
+})
+
 
 module.exports = router;
