@@ -74,8 +74,30 @@ router.post('/', function (req, res) {
     }
 })
 
-router.post('/:id', function (req, res) {
+router.put('/:id', function (req, res) {
 
+    if (req.body.name && req.body.email) {
+
+        users.findOneAndReplace({_id: req.params.id}, req.body, function (err, doc) {
+            if (err) {
+                res.status(404).send({
+                    message: 'User with id not found',
+                    data: {}
+                })
+            } else {
+                res.status(200).send({
+                    message: 'PUT successful',
+                    data: doc
+                })
+            }
+        })
+
+    } else {
+        res.status(404).send({
+            message: 'User replacement requires name and email fields',
+            data: {}
+        })
+    }
 })
 
 router.delete('/:id', function (req, res) {
