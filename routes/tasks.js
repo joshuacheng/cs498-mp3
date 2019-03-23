@@ -77,6 +77,32 @@ router.post('/', function (req, res) {
     }
 })
 
+router.put('/:id', function (req, res) {
+
+    if (req.body.name && req.body.deadline) {
+
+        tasks.findOneAndReplace({ _id: req.params.id }, req.body, function (err, doc) {
+            if (err) {
+                res.status(404).send({
+                    message: 'Task with id not found',
+                    data: {}
+                })
+            } else {
+                res.status(200).send({
+                    message: 'PUT successful',
+                    data: doc
+                })
+            }
+        })
+
+    } else {
+        res.status(404).send({
+            message: 'User replacement requires name and deadline fields',
+            data: {}
+        })
+    }
+})
+
 router.delete('/:id', function (req, res) {
     users.findByIdAndDelete(req.params.id, function (err) {
         if (err) {
