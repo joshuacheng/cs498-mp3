@@ -42,16 +42,29 @@ router.post('/', function (req, res) {
 
     // A user must have a name and email
     if (req.body.name && req.body.email) {
-        users.create({
-            _id: new mongoose.Types.ObjectId(),
-            name: req.body.name,
-            email: req.body.email,
-            pendingTasks: req.body.pendingTasks || []
-        }, (err, newUser) => {
-            res.status(201).send({
-                message: 'POST /users successful',
-                user: newUser
-            })
+
+        // Check if that email already exists
+        users.find({email: req.body.email}, function (err, doc) {
+            if (doc.length) {
+                console.log('found dupe email');
+                res.status(409).send({
+                    message: 'User with email already exists',
+                    data: {}
+                })
+            } else {
+                // If not, create new user
+                users.create({
+                    _id: new mongoose.Types.ObjectId(),
+                    name: req.body.name,
+                    email: req.body.email,
+                    pendingTasks: req.body.pendingTasks || []
+                }, (err, newUser) => {
+                    res.status(201).send({
+                        message: 'POST /users successful',
+                        data: newUser
+                    })
+                })
+            }
         })
     } else {
         res.status(404).send({
@@ -59,6 +72,10 @@ router.post('/', function (req, res) {
             data: {}
         })
     }
+})
+
+router.post('/:id', function (req, res) {
+
 })
 
 router.delete('/:id', function (req, res) {
