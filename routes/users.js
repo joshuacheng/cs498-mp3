@@ -15,9 +15,10 @@ router.get('/', function (req, res) {
     const select = queries.select ? JSON.parse(queries.select) : {};
     const conditions = queries.where ? JSON.parse(queries.where) : {};
 
-    // const options = {};
-    // if (queries.skip) options.skip = queries.skip;
-    // if (queries.limit) options.limit = queries.limit;
+    const options = {};
+    options.skip = queries.skip || 0;
+    options.limit = queries.limit || 0;
+    options.sort = queries.sort || {};
 
     users.find(conditions, select, {}, function (err, docs) {
         if (err) {
@@ -42,10 +43,17 @@ router.get('/', function (req, res) {
             }
             
         } else {
-            res.status(200).send({
-                message: 'OK',
-                data: docs
-            })
+            if (queries.count && queries.count === true) {
+                res.status(200).send({
+                    message: 'OK',
+                    data: docs.length
+                })
+            } else {
+                res.status(200).send({
+                    message: 'OK',
+                    data: docs
+                })
+            }
         }
     })
 })

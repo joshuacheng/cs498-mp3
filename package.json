@@ -22,6 +22,7 @@
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
+    "express-query-boolean": "^2.0.0",
     "mongoose": "^5.4.18",
     "mongoose-query-parser": "^1.1.4",
     "nodemon": "^1.11.0",
