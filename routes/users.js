@@ -1,17 +1,46 @@
 var users = require('../models/user');
     express = require('express'),
     router = express.Router(),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    querymen = require('querymen');
+
+// const parser = new MongooseQueryParser();
 
 // direct router export method
-
 router.get('/', function (req, res) {
-    users.find({}, (err, docs) => {
+    const queries = req.query;
+    console.log(queries);
+
+    // Handle queries
+    const select = queries.select ? JSON.parse(queries.select) : {};
+    const conditions = queries.where ? JSON.parse(queries.where) : {};
+
+    // const options = {};
+    // if (queries.skip) options.skip = queries.skip;
+    // if (queries.limit) options.limit = queries.limit;
+
+    users.find(conditions, select, {}, function (err, docs) {
         if (err) {
-            res.status(500).send({
-                message: 'Server error',
-                data: {}
-            })
+            console.log(err.message);
+
+            if (err.name === 'CastError' && err.path === '_id') {
+                res.status(500).send({
+                    message: '_id entered could not be casted to Mongoose ObjectID',
+                    data: {}
+                })
+            } else if (err.name === 'CastError') {
+                res.status(500).send({
+                    message: 'One of the fields entered could not be cast correctly',
+                    data: {}
+                })
+            
+            } else {
+                res.status(500).send({
+                    message: 'Server error',
+                    data: {}
+                })
+            }
+            
         } else {
             res.status(200).send({
                 message: 'OK',

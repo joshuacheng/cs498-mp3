@@ -23,6 +23,8 @@
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "mongoose": "^5.4.18",
-    "nodemon": "^1.11.0"
+    "mongoose-query-parser": "^1.1.4",
+    "nodemon": "^1.11.0",
+    "querymen": "^2.1.3"
   }
 }
