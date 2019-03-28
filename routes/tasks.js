@@ -175,9 +175,23 @@ router.delete('/:id', function (req, res) {
                 data: {}
             })
         } else {
-            res.status(200).send({
-                message: 'DELETE task successful'
-            })
+            /* When a task is deleted, the user with said task should also
+             * no longer have it in their pendingTasks array
+             */
+            users.update({ pendingTasks: { $elemMatch: { $eq: req.params.id} }},
+                         { $pullAll: { pendingTasks: [req.params.id] } },
+                            function (err, result) {
+                                if (err) {
+                                    res.status(404).send({
+                                        message: 'delete went wrong',
+                                        data: {}
+                                    })
+                                } else {
+                                    res.status(200).send({
+                                        message: 'DELETE task successful'
+                                    })
+                                }                                 
+                             })
         }
     })
 })
