@@ -1,9 +1,29 @@
 var tasks = require('../models/task'),
+    users = require('../models/user')
     express = require('express'),
     router = express.Router();
 
 router.get('/', function (req, res) {
-    tasks.find({}, function (err, docs) {
+    const queries = req.query;
+
+    // Handle queries
+
+    // First find() param
+    const select = queries.select ? JSON.parse(queries.select) :
+                   queries.filter ? JSON.parse(queries.filter) : {};
+
+    // Second find() param
+    const conditions = queries.where ? JSON.parse(queries.where) : {};
+
+    // Third find() param
+    const options = {};
+    options.skip = queries.skip || 0;
+    options.limit = queries.limit || 0;
+    options.sort = queries.sort ? JSON.parse(queries.sort) : {};
+
+    console.log(options);
+
+    tasks.find(conditions, select, options, function (err, docs) {
         if (err) {
             res.status(500).send({
                 message: 'Server error',
@@ -42,6 +62,9 @@ router.post('/', function (req, res) {
         *  figure out best way to handle writing
         *  all the properties into the new task object
         *  https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/forms 
+        *
+        * REVIEW2: 
+        * if assignedUser exists, we need to add the task to the user as well 
         */
         tasks.create({
             name: req.body.name,
@@ -60,12 +83,52 @@ router.post('/', function (req, res) {
                         message: 'A task field is of the wrong type',
                         data: {}
                     })
+                } else {
+                    res.status(404).send({
+                        message: 'There is an error creating the task',
+                        data: {}
+                    })
                 }
             } else {
-                res.status(200).send({
-                    message: 'POST /tasks successful',
-                    data: createdTask
-                })
+
+                /* Note: Right now the database assumes that when a task is entered
+                 *       with assignedUser and assignedUserName, they are both correct.
+                 *       This only checks that the assignedUser exists, not the name.
+                 */
+                if (createdTask.assignedUser) {
+                    users.findById(createdTask.assignedUser, function (err, user) {
+                        if (err) {
+                            console.log(err.message);
+                            res.status(404).send({
+                                message: 'Error in finding user',
+                                data: {}
+                            })
+                        }
+
+                        /* user with that ID exists */
+                        if (user) {
+                            user.pendingTasks.push(createdTask._id);
+
+                            user.save(function (err, product) {
+                                res.status(200).send({
+                                    message: 'Task created and assigned to user',
+                                    data: createdTask
+                                })
+                            })
+                        } else {
+                            console.log('Specified assignedUser does not exist');
+                            res.status(200).send({
+                                message: 'User does not exist but task successfully created',
+                                data: createdTask 
+                            })
+                        }
+                    })
+                } else {
+                    res.status(200).send({
+                        message: 'POST /tasks successful',
+                        data: createdTask
+                    })
+                }
             }
         })
         
@@ -104,7 +167,7 @@ router.put('/:id', function (req, res) {
 })
 
 router.delete('/:id', function (req, res) {
-    users.findByIdAndDelete(req.params.id, function (err) {
+    tasks.findByIdAndDelete(req.params.id, function (err) {
         if (err) {
             console.log(err.errors);
             res.status(404).send({

@@ -71,6 +71,7 @@ def main(argv):
 
     # Loop for as long as the database still returns users
     while len(users):
+        print('here')
 
         # Delete each individual user
         for user in users:

@@ -4,23 +4,24 @@ var users = require('../models/user');
     mongoose = require('mongoose'),
     querymen = require('querymen');
 
-// const parser = new MongooseQueryParser();
-
 // direct router export method
 router.get('/', function (req, res) {
     const queries = req.query;
-    console.log(queries);
 
     // Handle queries
-    const select = queries.select ? JSON.parse(queries.select) : {};
+    const select = queries.select ? JSON.parse(queries.select) :
+                   queries.filter ? JSON.parse(queries.filter) : {};
+                   
     const conditions = queries.where ? JSON.parse(queries.where) : {};
 
     const options = {};
     options.skip = queries.skip || 0;
     options.limit = queries.limit || 0;
-    options.sort = queries.sort || {};
+    options.sort = queries.sort ? JSON.parse(queries.sort) : {};
 
-    users.find(conditions, select, {}, function (err, docs) {
+    console.log(options);
+
+    users.find(conditions, select, options, function (err, docs) {
         if (err) {
             console.log(err.message);
 
