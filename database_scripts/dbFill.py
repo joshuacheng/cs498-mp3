@@ -145,6 +145,8 @@ def main(argv):
             params = urllib.parse.urlencode({'_id': assignedUserID, 'name': assignedUserName, 'email': assignedUserEmail, 'dateCreated': assignedUserDate, 'pendingTasks': assignedUserTasks}, True)
             conn.request("PUT", "/api/users/"+assignedUserID, params, headers)
             response = conn.getresponse()
+            if response.status != 200:
+                 print('failed to putted')
             data = response.read()
             d = json.loads(data)
 

@@ -19,8 +19,6 @@ router.get('/', function (req, res) {
     options.limit = queries.limit || 0;
     options.sort = queries.sort ? JSON.parse(queries.sort) : {};
 
-    console.log(options);
-
     users.find(conditions, select, options, function (err, docs) {
         if (err) {
             console.log(err.message);
@@ -116,12 +114,20 @@ router.put('/:id', function (req, res) {
 
     if (req.body.name && req.body.email) {
 
+        /* PUT calls should not be trying to change the ID, so if it is present,
+         * the _id field will just be ignored.
+         */ 
+        if (req.body._id) {
+            delete req.body._id;
+        }
+
         users.findOneAndReplace({_id: req.params.id}, req.body, function (err, doc) {
             if (err) {
                 res.status(404).send({
                     message: 'User with id not found',
                     data: {}
                 })
+                console.log(err);
             } else {
                 res.status(200).send({
                     message: 'PUT successful',

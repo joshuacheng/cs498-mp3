@@ -21,8 +21,6 @@ router.get('/', function (req, res) {
     options.limit = queries.limit || 0;
     options.sort = queries.sort ? JSON.parse(queries.sort) : {};
 
-    console.log(options);
-
     tasks.find(conditions, select, options, function (err, docs) {
         if (err) {
             res.status(500).send({
@@ -56,7 +54,6 @@ router.get('/:id', function (req, res) {
 
 router.post('/', function (req, res) {
     if (req.body.name && req.body.deadline) {
-        console.log('success');
 
         /*REVIEW:
         *  figure out best way to handle writing
@@ -178,7 +175,7 @@ router.delete('/:id', function (req, res) {
             /* When a task is deleted, the user with said task should also
              * no longer have it in their pendingTasks array
              */
-            users.update({ pendingTasks: { $elemMatch: { $eq: req.params.id} }},
+            users.updateOne({ pendingTasks: { $elemMatch: { $eq: req.params.id} }},
                          { $pullAll: { pendingTasks: [req.params.id] } },
                             function (err, result) {
                                 if (err) {
