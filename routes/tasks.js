@@ -23,15 +23,37 @@ router.get('/', function (req, res) {
 
     tasks.find(conditions, select, options, function (err, docs) {
         if (err) {
-            res.status(500).send({
-                message: 'Server error',
-                data: {}
-            })
+            console.log(err.message);
+
+            if (err.name === 'CastError' && err.path === '_id') {
+                res.status(500).send({
+                    message: '_id entered could not be casted to Mongoose ObjectID',
+                    data: {}
+                })
+            } else if (err.name === 'CastError') {
+                res.status(500).send({
+                    message: 'One of the fields entered could not be cast correctly',
+                    data: {}
+                })
+
+            } else {
+                res.status(500).send({
+                    message: 'Server error',
+                    data: {}
+                })
+            }
         } else {
-            res.status(200).send({
-                message: 'OK',
-                data: docs
-            })
+            if (queries.count && queries.count === true) {
+                res.status(200).send({
+                    message: 'OK',
+                    data: docs.length
+                })
+            } else {
+                res.status(200).send({
+                    message: 'OK',
+                    data: docs
+                })
+            }
         }
     })
 })
