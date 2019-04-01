@@ -163,7 +163,7 @@ router.put('/:id', function (req, res) {
 
     if (req.body.name && req.body.deadline) {
 
-        tasks.findOneAndReplace({ _id: req.params.id }, req.body, function (err, doc) {
+        tasks.findOneAndUpdate({ _id: req.params.id }, req.body, {new: true}, function (err, doc) {
             if (err) {
                 res.status(404).send({
                     message: 'Task with id not found',

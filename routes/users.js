@@ -121,7 +121,7 @@ router.put('/:id', function (req, res) {
             delete req.body._id;
         }
 
-        users.findOneAndReplace({_id: req.params.id}, req.body, function (err, doc) {
+        users.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function (err, doc) {
             if (err) {
                 res.status(404).send({
                     message: 'User with id not found',
