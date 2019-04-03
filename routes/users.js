@@ -1,4 +1,5 @@
-var users = require('../models/user');
+var users = require('../models/user'),
+    tasks = require('../models/task'),
     express = require('express'),
     router = express.Router(),
     mongoose = require('mongoose'),
@@ -145,7 +146,7 @@ router.put('/:id', function (req, res) {
 })
 
 router.delete('/:id', function (req, res) {
-    users.findByIdAndDelete(req.params.id, function (err) {
+    users.findByIdAndDelete(req.params.id, function (err, doc) {
         if (err) {
             console.log(err.errors);
             res.status(404).send({
@@ -153,9 +154,15 @@ router.delete('/:id', function (req, res) {
                 data: {}
             })
         } else {
-            res.status(200).send({
-                message: 'DELETE user successful'
-            })
+            /* Delete this user from all tasks it had */
+            tasks.updateMany({_id: {$in: doc.pendingTasks }}, 
+                             { assignedUser: "", assignedUserName: "unassigned" },
+                             function() {
+                                 res.status(200).send({
+                                     message: 'DELETE user successful',
+                                     data: doc
+                                 })
+                             })
         }
     })
 })
