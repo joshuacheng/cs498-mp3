@@ -128,17 +128,21 @@ router.post('/', function (req, res) {
                         if (user) {
                             user.pendingTasks.push(createdTask._id);
 
-                            user.save(function (err, product) {
+                            user.save(function () {
                                 res.status(200).send({
                                     message: 'Task created and assigned to user',
                                     data: createdTask
                                 })
                             })
                         } else {
-                            console.log('Specified assignedUser does not exist');
-                            res.status(200).send({
-                                message: 'User does not exist but task successfully created',
-                                data: createdTask 
+                            console.log('Specified assignedUser does not exist; unassigning field');
+                            createdTask.assignedUser = "";
+                            createdTask.assignedUserName = "unassigned";
+                            createdTask.save(function() {
+                                res.status(200).send({
+                                    message: 'assignUser does not exist but task successfully created',
+                                    data: createdTask
+                                })
                             })
                         }
                     })
